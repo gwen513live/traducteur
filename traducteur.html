@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <meta name="theme-color" content="#0a1628" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>FR → EN</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Mono:wght@300;400&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0a1628;
+      --surface:  #0f1f3d;
+      --accent:   #e8c84a;
+      --accent2:  #4ab8e8;
+      --text:     #e8e4d9;
+      --muted:    #6b7a99;
+      --border:   #1e3058;
+      --radius:   16px;
+    }
+
+    html, body {
+      height: 100%;
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'DM Mono', monospace;
+      overscroll-behavior: none;
+    }
+
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100dvh;
+      padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+    }
+
+    /* Background pattern */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 10%, rgba(74,184,232,0.08) 0%, transparent 60%),
+        radial-gradient(ellipse 60% 40% at 80% 90%, rgba(232,200,74,0.06) 0%, transparent 60%);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .app {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      max-width: 480px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 20px 16px 24px;
+      gap: 16px;
+    }
+
+    /* Header */
+    header {
+      display: flex;
+      align-items: baseline;
+      gap: 10px;
+      padding-bottom: 4px;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 28px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      color: var(--text);
+    }
+
+    header .sep {
+      font-family: 'DM Mono', monospace;
+      font-size: 18px;
+      color: var(--accent);
+      font-weight: 300;
+    }
+
+    header .lang-tag {
+      font-size: 11px;
+      letter-spacing: 2px;
+      color: var(--muted);
+      text-transform: uppercase;
+    }
+
+    /* Language bar */
+    .lang-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 11px;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .lang-bar .lang {
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--surface);
+      font-family: 'DM Mono', monospace;
+    }
+    .lang-bar .lang.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+    .lang-bar .arrow {
+      color: var(--accent2);
+      font-size: 14px;
+    }
+    .btn-swap {
+      background: none;
+      border: 1px solid var(--accent2);
+      color: var(--accent2);
+      font-size: 15px;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.25s;
+      flex-shrink: 0;
+      padding: 0;
+    }
+    .btn-swap:hover { background: rgba(74,184,232,0.12); }
+
+    /* Input zone */
+    .input-zone {
+      position: relative;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      transition: border-color 0.2s;
+    }
+    .input-zone:focus-within {
+      border-color: var(--accent2);
+    }
+
+    .input-label {
+      position: absolute;
+      top: 12px;
+      left: 14px;
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+
+    textarea {
+      width: 100%;
+      min-height: 140px;
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text);
+      font-family: 'Playfair Display', serif;
+      font-size: 22px;
+      font-style: italic;
+      font-weight: 400;
+      line-height: 1.4;
+      padding: 36px 14px 14px;
+      resize: none;
+      caret-color: var(--accent);
+    }
+
+    textarea::placeholder {
+      color: var(--muted);
+      font-style: italic;
+      font-size: 18px;
+    }
+
+    .input-actions {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 8px;
+      padding: 0 10px 10px;
+    }
+
+    .btn-clear {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      font-size: 11px;
+      letter-spacing: 1px;
+      padding: 6px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .btn-clear:hover { border-color: var(--muted); color: var(--text); }
+
+    /* Bouton micro */
+    .btn-mic {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      border: 2px solid var(--accent2);
+      background: rgba(74,184,232,0.08);
+      color: var(--accent2);
+      font-size: 26px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      flex-shrink: 0;
+    }
+    .btn-mic:active { transform: scale(0.94); }
+    .btn-mic.listening {
+      background: rgba(232,74,74,0.15);
+      border-color: #e84a4a;
+      color: #e84a4a;
+      animation: pulse-mic 1s ease-in-out infinite;
+    }
+    .btn-mic.unsupported { border-color: var(--border); color: var(--muted); cursor: not-allowed; opacity: 0.4; }
+    @keyframes pulse-mic {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(232,74,74,0.4); }
+      50%       { box-shadow: 0 0 0 14px rgba(232,74,74,0); }
+    }
+    .action-row { display: flex; gap: 12px; align-items: center; }
+    .action-row .btn-translate { flex: 1; }
+    .voice-status {
+      text-align: center;
+      font-size: 11px;
+      letter-spacing: 1px;
+      color: #e84a4a;
+      min-height: 16px;
+      display: none;
+    }
+    .voice-status.visible { display: block; }
+
+    /* Translate button */
+    .btn-translate {
+      width: 100%;
+      padding: 16px;
+      background: var(--accent);
+      color: var(--bg);
+      border: none;
+      border-radius: var(--radius);
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      font-weight: 400;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-translate:active { transform: scale(0.98); }
+    .btn-translate:disabled {
+      background: var(--border);
+      color: var(--muted);
+      cursor: not-allowed;
+    }
+
+    .btn-translate .spinner {
+      display: none;
+      width: 16px;
+      height: 16px;
+      border: 2px solid rgba(10,22,40,0.3);
+      border-top-color: var(--bg);
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      margin: 0 auto;
+    }
+    .btn-translate.loading .btn-text { display: none; }
+    .btn-translate.loading .spinner { display: block; }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Result zone */
+    .result-zone {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 14px;
+      min-height: 120px;
+      position: relative;
+      transition: border-color 0.3s;
+    }
+    .result-zone.has-result { border-color: rgba(74,184,232,0.4); }
+
+    .result-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+
+    .result-text {
+      font-family: 'Playfair Display', serif;
+      font-size: 24px;
+      font-weight: 700;
+      line-height: 1.35;
+      color: var(--accent2);
+      min-height: 36px;
+      word-break: break-word;
+    }
+
+    .result-placeholder {
+      font-family: 'DM Mono', monospace;
+      font-size: 13px;
+      color: var(--border);
+      letter-spacing: 1px;
+    }
+
+    .result-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+    }
+
+    .confidence {
+      font-size: 10px;
+      letter-spacing: 1px;
+      color: var(--muted);
+    }
+
+    .btn-copy {
+      background: none;
+      border: 1px solid var(--accent2);
+      color: var(--accent2);
+      font-family: 'DM Mono', monospace;
+      font-size: 10px;
+      letter-spacing: 1px;
+      padding: 5px 12px;
+      border-radius: 20px;
+      cursor: pointer;
+      transition: all 0.15s;
+      text-transform: uppercase;
+    }
+    .btn-copy:hover { background: rgba(74,184,232,0.1); }
+    .btn-copy.copied { border-color: var(--accent); color: var(--accent); }
+
+    /* Error */
+    .error-msg {
+      background: rgba(232,74,74,0.1);
+      border: 1px solid rgba(232,74,74,0.3);
+      color: #e84a4a;
+      border-radius: var(--radius);
+      padding: 12px 14px;
+      font-size: 13px;
+      display: none;
+    }
+    .error-msg.visible { display: block; }
+
+    /* History */
+    .history-section { flex: 1; }
+    .history-label {
+      font-size: 9px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
+    .history-list { display: flex; flex-direction: column; gap: 8px; }
+
+    .history-item {
+      background: rgba(15,31,61,0.6);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 10px 12px;
+      cursor: pointer;
+      transition: border-color 0.15s;
+    }
+    .history-item:hover { border-color: var(--muted); }
+
+    .history-fr {
+      font-family: 'Playfair Display', serif;
+      font-size: 14px;
+      font-style: italic;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .history-en {
+      font-family: 'DM Mono', monospace;
+      font-size: 12px;
+      color: var(--accent2);
+      letter-spacing: 0.5px;
+    }
+
+    /* Footer note */
+    .footer-note {
+      text-align: center;
+      font-size: 9px;
+      letter-spacing: 1.5px;
+      color: var(--border);
+      text-transform: uppercase;
+      padding-top: 4px;
+    }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <header>
+    <h1>Traducteur</h1>
+    <span class="sep">/</span>
+    <span class="lang-tag">sans IA</span>
+  </header>
+
+  <div class="lang-bar">
+    <span class="lang active" id="langFrom">Français</span>
+    <button class="btn-swap" onclick="swapLangs()" title="Inverser les langues">⇄</button>
+    <span class="lang" id="langTo">English</span>
+  </div>
+
+  <div class="input-zone">
+    <span class="input-label">Mot ou phrase</span>
+    <textarea id="inputText" placeholder="Écris ici…" rows="4" autocomplete="off" autocorrect="off" spellcheck="true" lang="fr"></textarea>
+    <div class="input-actions">
+      <button class="btn-clear" onclick="clearAll()">Effacer</button>
+    </div>
+  </div>
+
+  <div class="action-row">
+    <button class="btn-mic" id="micBtn" onclick="toggleMic()" title="Parler en français">🎤</button>
+    <button class="btn-translate" id="translateBtn" onclick="doTranslate()">
+      <span class="btn-text">↓ Traduire</span>
+      <div class="spinner"></div>
+    </button>
+  </div>
+
+  <div class="voice-status" id="voiceStatus">● Écoute en cours…</div>
+
+  <div class="error-msg" id="errorMsg"></div>
+
+  <div class="result-zone" id="resultZone">
+    <div class="result-label">Traduction anglaise</div>
+    <div class="result-text" id="resultText">
+      <span class="result-placeholder">— — —</span>
+    </div>
+    <div class="result-footer" id="resultFooter" style="display:none">
+      <span class="confidence" id="confidenceText"></span>
+      <button class="btn-copy" id="copyBtn" onclick="copyResult()">Copier</button>
+    </div>
+  </div>
+
+  <div class="history-section" id="historySection" style="display:none">
+    <div class="history-label">Historique</div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <div class="footer-note">MyMemory &amp; Lingva API · aucune IA</div>
+</div>
+
+<script>
+  const translHistory = [];
+  let jsonpTimer = null;
+  let recognition = null;
+  let isListening = false;
+
+  // Direction : 'fr-en' ou 'en-fr'
+  let direction = 'fr-en';
+
+  function swapLangs() {
+    direction = direction === 'fr-en' ? 'en-fr' : 'fr-en';
+    const isFrEn = direction === 'fr-en';
+
+    document.getElementById('langFrom').textContent = isFrEn ? 'Français' : 'English';
+    document.getElementById('langTo').textContent   = isFrEn ? 'English'  : 'Français';
+    document.getElementById('langFrom').classList.add('active');
+    document.getElementById('langTo').classList.remove('active');
+
+    // Mettre à jour la langue du micro
+    if (recognition) {
+      recognition.lang = isFrEn ? 'fr-FR' : 'en-US';
+    }
+
+    // Mettre à jour le placeholder
+    document.getElementById('inputText').placeholder = isFrEn ? 'Écris ici…' : 'Write here…';
+    document.getElementById('inputText').lang = isFrEn ? 'fr' : 'en';
+
+    // Vider les champs
+    clearAll();
+  }
+
+  // ── Reconnaissance vocale ──────────────────────────────────────
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  const micBtn = document.getElementById('micBtn');
+  const voiceStatus = document.getElementById('voiceStatus');
+
+  if (!SpeechRecognition) {
+    micBtn.classList.add('unsupported');
+    micBtn.title = 'Reconnaissance vocale non supportée sur ce navigateur';
+  } else {
+    recognition = new SpeechRecognition();
+    recognition.lang = 'fr-FR';
+    recognition.continuous = false;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+      isListening = true;
+      micBtn.classList.add('listening');
+      micBtn.textContent = '⏹';
+      voiceStatus.classList.add('visible');
+      document.getElementById('inputText').placeholder = 'Parle maintenant…';
+    };
+
+    recognition.onresult = (e) => {
+      let interim = '';
+      let final = '';
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) final += t;
+        else interim += t;
+      }
+      document.getElementById('inputText').value = final || interim;
+    };
+
+    recognition.onend = () => {
+      isListening = false;
+      micBtn.classList.remove('listening');
+      micBtn.textContent = '🎤';
+      voiceStatus.classList.remove('visible');
+      const placeholder = direction === 'fr-en' ? 'Écris ici…' : 'Write here…';
+      document.getElementById('inputText').placeholder = placeholder;
+      // Traduire automatiquement si quelque chose a été capté
+      const text = document.getElementById('inputText').value.trim();
+      if (text) doTranslate();
+    };
+
+    recognition.onerror = (e) => {
+      isListening = false;
+      micBtn.classList.remove('listening');
+      micBtn.textContent = '🎤';
+      voiceStatus.classList.remove('visible');
+      const placeholder = direction === 'fr-en' ? 'Écris ici…' : 'Write here…';
+      document.getElementById('inputText').placeholder = placeholder;
+      if (e.error !== 'no-speech' && e.error !== 'aborted') {
+        showError('Micro inaccessible. Autorise le micro dans Chrome.');
+      }
+    };
+  }
+
+  function toggleMic() {
+    if (!recognition) return;
+    if (isListening) {
+      recognition.stop();
+    } else {
+      recognition.lang = direction === 'fr-en' ? 'fr-FR' : 'en-US';
+      document.getElementById('errorMsg').classList.remove('visible');
+      document.getElementById('inputText').value = '';
+      recognition.start();
+    }
+  }
+
+  // Entrée seul = traduire (sauf shift+entrée)
+  document.getElementById('inputText').addEventListener('keydown', e => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      doTranslate();
+    }
+  });
+
+  // Callback global appelé par MyMemory JSONP
+  window.mmCallback = function(data) {
+    clearTimeout(jsonpTimer);
+    // Nettoyer la balise script
+    const old = document.getElementById('jsonpScript');
+    if (old) old.remove();
+
+    const btn = document.getElementById('translateBtn');
+    btn.classList.remove('loading');
+    btn.disabled = false;
+
+    if (!data || data.responseStatus !== 200) {
+      showError('Service indisponible. Réessaie dans un moment.');
+      return;
+    }
+    const translated = data.responseData.translatedText;
+    const confidence = Math.round(data.responseData.match * 100);
+    const inputText = document.getElementById('inputText').value.trim();
+    showResult(translated, confidence);
+    addToHistory(inputText, translated);
+  };
+
+  function doTranslate() {
+    const text = document.getElementById('inputText').value.trim();
+    if (!text) return;
+
+    const btn = document.getElementById('translateBtn');
+    const errorMsg = document.getElementById('errorMsg');
+    errorMsg.classList.remove('visible');
+
+    btn.classList.add('loading');
+    btn.disabled = true;
+
+    // Supprimer l'ancien script JSONP s'il existe
+    const old = document.getElementById('jsonpScript');
+    if (old) old.remove();
+
+    // Timeout si pas de réponse en 8 secondes
+    jsonpTimer = setTimeout(() => {
+      const s = document.getElementById('jsonpScript');
+      if (s) s.remove();
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      showError('Délai dépassé. Vérifie ta connexion internet.');
+    }, 8000);
+
+    // Injection JSONP — contourne les restrictions file://
+    const langpair = direction === 'fr-en' ? 'fr|en' : 'en|fr';
+    const url = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(text)}&langpair=${langpair}&of=json&callback=mmCallback`;
+    const script = document.createElement('script');
+    script.id = 'jsonpScript';
+    script.src = url;
+    script.onerror = () => {
+      clearTimeout(jsonpTimer);
+      script.remove();
+      btn.classList.remove('loading');
+      btn.disabled = false;
+      showError('Impossible de joindre le service. Vérifie ta connexion internet.');
+    };
+    document.head.appendChild(script);
+  }
+
+  function showError(msg) {
+    const errorMsg = document.getElementById('errorMsg');
+    errorMsg.textContent = '⚠ ' + msg;
+    errorMsg.classList.add('visible');
+  }
+
+  function showResult(text, confidence) {
+    const zone = document.getElementById('resultZone');
+    const resultText = document.getElementById('resultText');
+    const footer = document.getElementById('resultFooter');
+    const confSpan = document.getElementById('confidenceText');
+
+    resultText.textContent = text;
+    resultText.style.animation = 'none';
+    requestAnimationFrame(() => {
+      resultText.style.animation = 'fadeIn 0.4s ease';
+    });
+
+    confSpan.textContent = `fiabilité · ${confidence}%`;
+    footer.style.display = 'flex';
+    zone.classList.add('has-result');
+
+    document.getElementById('copyBtn').textContent = 'Copier';
+    document.getElementById('copyBtn').classList.remove('copied');
+  }
+
+  function copyResult() {
+    const text = document.getElementById('resultText').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copyBtn');
+      btn.textContent = '✓ Copié';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copier';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  function clearAll() {
+    document.getElementById('inputText').value = '';
+    document.getElementById('resultText').innerHTML = '<span class="result-placeholder">— — —</span>';
+    document.getElementById('resultFooter').style.display = 'none';
+    document.getElementById('resultZone').classList.remove('has-result');
+    document.getElementById('errorMsg').classList.remove('visible');
+    document.getElementById('inputText').focus();
+  }
+
+  function addToHistory(fr, en) {
+    translHistory.unshift({ fr, en });
+    if (translHistory.length > 6) translHistory.pop();
+    renderHistory();
+  }
+
+  function renderHistory() {
+    const section = document.getElementById('historySection');
+    const list = document.getElementById('historyList');
+    if (translHistory.length === 0) { section.style.display = 'none'; return; }
+
+    section.style.display = 'block';
+    list.innerHTML = translHistory.map((item, i) => `
+      <div class="history-item" onclick="reuseHistory(${i})">
+        <div class="history-fr">${escHtml(item.fr)}</div>
+        <div class="history-en">${escHtml(item.en)}</div>
+      </div>
+    `).join('');
+  }
+
+  function reuseHistory(i) {
+    document.getElementById('inputText').value = translHistory[i].fr;
+    showResult(translHistory[i].en, 100);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function escHtml(s) {
+    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+</script>
+
+<style>
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(4px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+</style>
+</body>
+</html>
